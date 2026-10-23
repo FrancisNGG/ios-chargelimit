@@ -23,7 +23,7 @@
 
 #include "logic.h"
 
-#define CL_VERSION       "1.0.1"
+#define CL_VERSION       "1.0.2"
 #define APP_ID           CFSTR("io.github.francisngg.chargelimit")
 #define USER_MOBILE      CFSTR("mobile")
 #define NOTIFY_CHANGED   "io.github.francisngg.chargelimit/changed"
@@ -33,6 +33,8 @@
 #define HEARTBEAT_TICKS  30     // 约 5 分钟记一行
 #define WARN_TICKS       3      // 连续几次发现「请求停充却仍在充电」才报警
 #define WARN_AMP_MA      50
+#define CONFIRM_DELAY    30     // 进入停充保持后至少过这么久、电流读数才算数（实时电流约 20 秒才刷新一次）
+#define CONFIRM_AMP_MA   20     // 电池电流绝对值不超过这个值，才算真的停下了
 #define STATUS_REFRESH   60     // 状态没变化时，每隔多少秒也刷新一次「更新时间」，让界面判断守护进程是否还活着
 
 typedef struct {
@@ -61,6 +63,7 @@ static applied_t g_applied = APPLIED_NONE;
 static int g_bad_ticks;
 static bool g_warned;
 static bool g_hold_confirmed;
+static time_t g_hold_since;
 static unsigned g_ticks;
 static char g_last_status[200];
 static time_t g_status_time;
@@ -254,13 +257,16 @@ static void tick(void) {
         if (g_applied != APPLIED_HOLD || b.charging) {
             if (g_applied != APPLIED_HOLD) {
                 lg("→ 停充保持（电量 %d%%，上限 %d%%，恢复线 %d%%）", b.level, p.upper, p.lower);
+                g_hold_since = time(NULL);
                 g_warned = false;
                 g_hold_confirmed = false;
                 g_bad_ticks = 0;
             }
             write_flags(false, true);
             g_applied = APPLIED_HOLD;
-        } else if (!g_hold_confirmed && b.amp <= 20) {
+        } else if (!g_hold_confirmed && time(NULL) - g_hold_since >= CONFIRM_DELAY
+                   && b.amp >= -CONFIRM_AMP_MA && b.amp <= CONFIRM_AMP_MA) {
+            // 刚从放电转过来时，电流读数还停留在放电阶段（负的大电流），要等它刷新后接近 0 才算数
             lg("停充已生效（实时电流 %dmA）", b.amp);
             g_hold_confirmed = true;
         }
