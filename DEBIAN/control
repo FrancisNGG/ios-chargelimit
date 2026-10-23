@@ -1,0 +1,9 @@
+Package: io.github.francisngg.chargelimit
+Name: ChargeLimit 充电限制
+Version: 1.1.1
+Architecture: iphoneos-arm
+Description: 电量到上限就停止充电的守护进程；设置页由配套的 ChargeLimit App（IPA）提供
+Maintainer: FrancisNGG
+Author: FrancisNGG
+Section: Tweaks
+Depends: firmware (>= 12.0)

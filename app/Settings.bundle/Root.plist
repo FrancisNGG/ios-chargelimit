@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Title</key>
+	<string>充电限制</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>充电限制</string>
+			<key>FooterText</key>
+			<string>电量达到「停充上限」就停止充电并保持，降到「恢复线」以下才重新充电。需要接着 USB 或电源适配器才起作用。电量不高于 20% 时，无论怎么设置都会正常充电。改完设置后最多约 10 秒生效。</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>启用充电限制</string>
+			<key>Key</key>
+			<string>enabled</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>电量范围</string>
+			<key>FooterText</key>
+			<string>例如上限 50%、回差 5%：充到 50% 停止，降到 45% 才重新开始充。</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>停充上限</string>
+			<key>Key</key>
+			<string>upper</string>
+			<key>DefaultValue</key>
+			<integer>50</integer>
+			<key>Titles</key>
+			<array>
+				<string>30%</string>
+				<string>35%</string>
+				<string>40%</string>
+				<string>45%</string>
+				<string>50%</string>
+				<string>55%</string>
+				<string>60%</string>
+				<string>65%</string>
+				<string>70%</string>
+				<string>75%</string>
+				<string>80%</string>
+				<string>85%</string>
+				<string>90%</string>
+				<string>95%</string>
+				<string>100%</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<integer>30</integer>
+				<integer>35</integer>
+				<integer>40</integer>
+				<integer>45</integer>
+				<integer>50</integer>
+				<integer>55</integer>
+				<integer>60</integer>
+				<integer>65</integer>
+				<integer>70</integer>
+				<integer>75</integer>
+				<integer>80</integer>
+				<integer>85</integer>
+				<integer>90</integer>
+				<integer>95</integer>
+				<integer>100</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>恢复线回差</string>
+			<key>Key</key>
+			<string>hysteresis</string>
+			<key>DefaultValue</key>
+			<integer>5</integer>
+			<key>Titles</key>
+			<array>
+				<string>低于上限 2%</string>
+				<string>低于上限 3%</string>
+				<string>低于上限 5%</string>
+				<string>低于上限 8%</string>
+				<string>低于上限 10%</string>
+				<string>低于上限 15%</string>
+				<string>低于上限 20%</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>5</integer>
+				<integer>8</integer>
+				<integer>10</integer>
+				<integer>15</integer>
+				<integer>20</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>放电</string>
+			<key>FooterText</key>
+			<string>电量高于上限时（例如现在 100%、上限 50%），断开外部供电，改由电池供电，直到降到上限，再转为保持。屏幕开着、耗电大时降得更快。关闭时只停止充电，电量不会主动下降。</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>高于上限时放电到上限</string>
+			<key>Key</key>
+			<string>drain</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>状态</string>
+			<key>FooterText</key>
+			<string>状态由后台守护进程更新，日志在 /var/log/chargelimit.log。重启 iPad 后需要重新越狱，守护进程才会运行。</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>当前</string>
+			<key>Key</key>
+			<string>statusText</string>
+			<key>DefaultValue</key>
+			<string>等待守护进程…</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,7 @@
+#!/bin/sh
+# 卸载/升级前：先停守护进程（它退出时会恢复默认充电），再无条件恢复一次，确保不会把设备留在停充状态。
+PLIST=/Library/LaunchDaemons/io.github.francisngg.chargelimit.plist
+
+launchctl unload "$PLIST" 2>/dev/null
+/usr/libexec/chargelimitd --reset 2>/dev/null
+exit 0

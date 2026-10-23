@@ -1,0 +1,12 @@
+#!/bin/sh
+# 安装/升级后：设置权限并启动守护进程。
+PLIST=/Library/LaunchDaemons/io.github.francisngg.chargelimit.plist
+
+chown root:wheel /usr/libexec/chargelimitd "$PLIST"
+chmod 755 /usr/libexec/chargelimitd
+chmod 644 "$PLIST"
+
+launchctl unload "$PLIST" 2>/dev/null
+launchctl load "$PLIST"
+
+exit 0

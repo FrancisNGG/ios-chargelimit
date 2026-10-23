@@ -1,0 +1,6 @@
+build/
+app/build/
+.DS_Store
+tools/probe
+tools/prefs_test
+tools/classcheck
