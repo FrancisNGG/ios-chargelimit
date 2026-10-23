@@ -132,7 +132,7 @@
 			<key>Title</key>
 			<string>状态</string>
 			<key>FooterText</key>
-			<string>状态由后台守护进程更新，日志在 /var/log/chargelimit.log。重启 iPad 后需要重新越狱，守护进程才会运行。</string>
+			<string>这一行只在进入本页时读取，之后不会自动刷新，退出再进入即可更新。想看实时状态，请打开桌面上的「充电限制」App（每 3 秒刷新）。状态由后台守护进程更新，日志在 /var/log/chargelimit.log。重启 iPad 后需要重新越狱，守护进程才会运行。</string>
 		</dict>
 		<dict>
 			<key>Type</key>

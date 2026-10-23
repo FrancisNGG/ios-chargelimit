@@ -84,8 +84,15 @@ static UILabel *MakeLabel(CGFloat size, UIFontWeight weight, UIColor *color) {
         _statusLabel.text = @"守护进程可能没有运行";
         _detailLabel.text = [NSString stringWithFormat:@"%.0f 分钟前最后一次状态：%@", age / 60, text];
     } else {
+        // 当前设置（与守护进程的规则一致：恢复线 = 上限 - 回差，但不低于 20%）
+        NSInteger upper = [d integerForKey:@"upper"];
+        NSInteger lower = MAX(upper - [d integerForKey:@"hysteresis"], 20);
+        NSString *config = [d boolForKey:@"enabled"]
+            ? [NSString stringWithFormat:@"设置：上限 %ld%% · 恢复线 %ld%%%@", (long)upper, (long)lower,
+                                         [d boolForKey:@"drain"] ? @" · 放电已开" : @""]
+            : @"设置：未启用";
         _statusLabel.text = text;
-        _detailLabel.text = [NSString stringWithFormat:@"%.0f 秒前更新", age];
+        _detailLabel.text = [NSString stringWithFormat:@"%@\n%.0f 秒前更新", config, age];
     }
 }
 
