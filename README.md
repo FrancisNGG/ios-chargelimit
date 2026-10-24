@@ -9,7 +9,7 @@
 | 部分 | 作用 | 安装方式 |
 |---|---|---|
 | **守护进程** `chargelimitd`（deb） | 每 10 秒读电量，决定允许充电 / 停充保持 / 放电，写电源标志。以 root 常驻，由 launchd 开机自启、崩溃自动拉起 | `./build.sh install` |
-| **设置页 App**（IPA） | 带一份 `Settings.bundle`，让「设置」最底部出现「充电限制」页；App 首页只显示守护进程状态 | `./app/build.sh install` |
+| **设置页 App**（IPA） | 带一份 `Settings.bundle`，让「设置」最底部出现「充电限制」页；App 首页每 3 秒刷新，显示守护进程状态和当前设置（**实时状态看这里**） | `./app/build.sh install` |
 
 两者通过同一个偏好文件通信：`/var/mobile/Library/Preferences/io.github.francisngg.chargelimit.plist`。设置页写 `enabled`、`upper`、`hysteresis`、`drain`；守护进程写 `statusText`、`statusTime`。
 
@@ -28,7 +28,7 @@ IPA 需要「无沙盒、无容器」权限（`app/entitlements.plist`），让�
 1. `./build.sh install` 装守护进程（需要先 `iproxy 2222 22`，SSH 别名 `ipad`）。
 2. `./app/build.sh install` 装设置页 App（USB 连接）。
 3. 「设置」→ 最底部「充电限制」：打开「启用充电限制」，选「停充上限」和「恢复线回差」。
-4. 改完设置最多约 10 秒生效；「当前」状态行要退出再进入页面才会刷新。
+4. 改完设置最多约 10 秒生效。设置页里的「当前」状态行只在进入页面时读取，要看实时状态请打开桌面上的「充电限制」App。
 
 默认是**关闭**状态，装完不会改变任何充电行为。
 
@@ -38,6 +38,7 @@ IPA 需要「无沙盒、无容器」权限（`app/entitlements.plist`），让�
 chargelimitd --status                 打印设置、电池和状态
 chargelimitd --set <key> <整数>       key: enabled | upper | hysteresis | drain
 chargelimitd --reset                  无条件恢复默认充电状态
+chargelimitd --version                守护进程自己的版本号（与 deb / IPA 的包版本号相互独立）
 ```
 
 日志：`/var/log/chargelimit.log`（含状态切换，以及停充后的自检结果）。
@@ -80,13 +81,13 @@ chargelimitd --reset                  无条件恢复默认充电状态
 python3 tools/make_icon.py app/icons    重新生成图标
 ```
 
-`tools/` 下是开发时的验证工具，都不属于产品：`probe.c` 验证硬件（`probe toggle|inflow <秒>`，任何退出方式都会恢复默认），`prefs_test.c` 验证 root 进程能写入 mobile 用户的偏好域，`classcheck.m` 确认设置 App 里的类名和私有接口。它们需要带权限声明签名后在设备上运行，用法见各文件开头的注释。
+`tools/` 下是开发时的验证工具，都不属于产品：`probe.c` 验证硬件（`probe toggle|inflow <秒>`，任何退出方式都会恢复默认），`prefs_test.c` 验证 root 进程能写入 mobile 用户的偏好域，`classcheck.m` 确认设置 App 里的类名和私有接口。它们需要带权限声明签名后在设备上运行：`ldid -Ssrc/entitlements.plist <可执行文件>`，用法见各文件开头的注释。
 
 ## 已知限制
 
 - **重启 iPad 后需要重新越狱**（checkra1n 是半不完美越狱），守护进程才会运行；这期间不会限制充电，也没有副作用，充电回到系统默认行为。
 - 「放电」模式下功耗大，从 100% 降到 50% 需要好几个小时；显示的电量在最顶上一小段下降得很慢。
-- 「当前」状态行不会实时刷新；设置页改动要等下一次轮询（≤10 秒）。
+- 设置页里的「当前」状态行不会实时刷新（系统限制），实时状态看 App 首页；设置页改动要等下一次轮询（≤10 秒）。
 - 桌面上有一个「充电限制」图标，无法隐藏（见上）。
 - 能不能停充取决于电池和电源芯片。判断办法：先在 100% 以外的电量下用 `probe toggle 120` 观察电流是否跟着变化。
 - 日志只在状态切换时记录，加上每 5 分钟一行心跳。
